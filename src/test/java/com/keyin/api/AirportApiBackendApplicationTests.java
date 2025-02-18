@@ -1,13 +1,8 @@
-package com.airport.api;
+package com.keyin.api;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
 class AirportApiBackendApplicationTests {
-
-	@Test
-	void contextLoads() {
-	}
 
 }
