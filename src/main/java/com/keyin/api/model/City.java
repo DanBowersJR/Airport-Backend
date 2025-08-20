@@ -1,26 +1,27 @@
 package com.keyin.api.model;
 
 import jakarta.persistence.*;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
+@Table(name = "cities")
 public class City {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
+
     private String state;
+
     private int population;
 
-    // One city has many airports
-    @OneToMany(mappedBy = "city", cascade = CascadeType.ALL)
-    private List<Airport> airports;
-
-    // One city can have many passengers
-    @OneToMany(mappedBy = "city", cascade = CascadeType.ALL)
-    private List<Passenger> passengers;
+    // One city has exactly one airport
+    @OneToOne(mappedBy = "city", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference // works with @JsonBackReference in Airport
+    private Airport airport;
 
     // Default constructor
     public City() {}
@@ -32,7 +33,7 @@ public class City {
         this.population = population;
     }
 
-    // Getters and Setters
+    // Getters & Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -45,9 +46,11 @@ public class City {
     public int getPopulation() { return population; }
     public void setPopulation(int population) { this.population = population; }
 
-    public List<Airport> getAirports() { return airports; }
-    public void setAirports(List<Airport> airports) { this.airports = airports; }
-
-    public List<Passenger> getPassengers() { return passengers; }
-    public void setPassengers(List<Passenger> passengers) { this.passengers = passengers; }
+    public Airport getAirport() { return airport; }
+    public void setAirport(Airport airport) {
+        this.airport = airport;
+        if (airport != null) {
+            airport.setCity(this); // keep both sides in sync
+        }
+    }
 }
