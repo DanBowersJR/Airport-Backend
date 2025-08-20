@@ -1,5 +1,6 @@
 # Ignore build artifacts
 target/
+build/
 
 ### Spring Tool Suite (STS) ###
 .apt_generated
@@ -22,7 +23,22 @@ target/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
 
 ### VS Code ###
 .vscode/
+
+### Logs ###
+*.log
+
+### OS-specific ###
+.DS_Store
+Thumbs.db
+
+### Spring Boot sensitive files ###
+src/main/resources/application.properties
+
+### Credentials / secrets ###
+*.env
+
+### Test reports ###
+/test-output/

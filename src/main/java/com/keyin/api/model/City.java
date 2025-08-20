@@ -1,7 +1,7 @@
 package com.keyin.api.model;
 
-import com.keyin.api.airport.Airport;
 import jakarta.persistence.*;
+import java.util.List;
 
 @Entity
 public class City {
@@ -14,8 +14,13 @@ public class City {
     private String state;
     private int population;
 
-    @OneToOne(mappedBy = "city", cascade = CascadeType.ALL)
-    private Airport airport;
+    // One city has many airports
+    @OneToMany(mappedBy = "city", cascade = CascadeType.ALL)
+    private List<Airport> airports;
+
+    // One city can have many passengers
+    @OneToMany(mappedBy = "city", cascade = CascadeType.ALL)
+    private List<Passenger> passengers;
 
     // Default constructor
     public City() {}
@@ -40,6 +45,9 @@ public class City {
     public int getPopulation() { return population; }
     public void setPopulation(int population) { this.population = population; }
 
-    public Airport getAirport() { return airport; }
-    public void setAirport(Airport airport) { this.airport = airport; }
+    public List<Airport> getAirports() { return airports; }
+    public void setAirports(List<Airport> airports) { this.airports = airports; }
+
+    public List<Passenger> getPassengers() { return passengers; }
+    public void setPassengers(List<Passenger> passengers) { this.passengers = passengers; }
 }
