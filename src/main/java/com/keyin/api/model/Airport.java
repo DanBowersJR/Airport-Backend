@@ -2,6 +2,10 @@ package com.keyin.api.model;
 
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "airports")
@@ -14,14 +18,19 @@ public class Airport {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false, unique = true, length = 10)
+    @Column(nullable = false, unique = true, length = 5)
     private String code;
 
-    // One airport belongs to exactly one city
-    @OneToOne
-    @JoinColumn(name = "city_id", nullable = false, unique = true)
-    @JsonBackReference // prevents infinite recursion with City -> Airport -> City
+    // ✅ Many Airports -> One City
+    @ManyToOne
+    @JoinColumn(name = "city_id", nullable = false)
+    @JsonBackReference // prevents recursion City -> Airport -> City
     private City city;
+
+    // ✅ One Airport -> Many Aircraft
+    @OneToMany(mappedBy = "airport", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference // matches @JsonBackReference in Aircraft
+    private List<Aircraft> aircraftList = new ArrayList<>();
 
     // Constructors
     public Airport() {}
@@ -29,7 +38,7 @@ public class Airport {
     public Airport(String name, String code, City city) {
         this.name = name;
         this.code = code;
-        setCity(city); // use setter to keep sync
+        this.city = city;
     }
 
     // Getters & Setters
@@ -43,10 +52,19 @@ public class Airport {
     public void setCode(String code) { this.code = code; }
 
     public City getCity() { return city; }
-    public void setCity(City city) {
-        this.city = city;
-        if (city != null && city.getAirport() != this) {
-            city.setAirport(this); // keep both sides in sync
-        }
+    public void setCity(City city) { this.city = city; }
+
+    public List<Aircraft> getAircraftList() { return aircraftList; }
+    public void setAircraftList(List<Aircraft> aircraftList) { this.aircraftList = aircraftList; }
+
+    // ✅ Helper methods for syncing both sides
+    public void addAircraft(Aircraft aircraft) {
+        aircraftList.add(aircraft);
+        aircraft.setAirport(this);
+    }
+
+    public void removeAircraft(Aircraft aircraft) {
+        aircraftList.remove(aircraft);
+        aircraft.setAirport(null);
     }
 }

@@ -1,6 +1,7 @@
 package com.keyin.api.controller;
 
-import com.keyin.api.model.City;
+import com.keyin.api.dto.CityDTO;
+import com.keyin.api.dto.AirportDTO;
 import com.keyin.api.service.CityService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,39 +15,54 @@ public class CityController {
 
     private final CityService cityService;
 
+    // ✅ Constructor injection
     public CityController(CityService cityService) {
         this.cityService = cityService;
     }
 
-    // ✅ Get all cities
+    // ✅ GET all cities (DTOs only)
     @GetMapping
-    public ResponseEntity<List<City>> getAllCities() {
+    public ResponseEntity<List<CityDTO>> getAllCities() {
         return ResponseEntity.ok(cityService.getAllCities());
     }
 
-    // ✅ Get one city by ID (404 handled in service)
+    // ✅ GET one city by ID (DTO only)
     @GetMapping("/{id}")
-    public ResponseEntity<City> getCityById(@PathVariable Long id) {
+    public ResponseEntity<CityDTO> getCityById(@PathVariable Long id) {
         return ResponseEntity.ok(cityService.getCityById(id));
     }
 
-    // ✅ Create a new city
+    // ✅ CREATE new city (accepts DTO, returns DTO)
     @PostMapping
-    public ResponseEntity<City> createCity(@RequestBody City city) {
-        City savedCity = cityService.saveCity(city);
-        return new ResponseEntity<>(savedCity, HttpStatus.CREATED); // 201 Created
+    public ResponseEntity<CityDTO> createCity(@RequestBody CityDTO cityDTO) {
+        CityDTO savedCity = cityService.saveCity(cityDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedCity);
     }
 
-    // ✅ Update a city
+    // ✅ UPDATE existing city (accepts DTO, returns DTO)
     @PutMapping("/{id}")
-    public ResponseEntity<City> updateCity(@PathVariable Long id, @RequestBody City updatedCity) {
-        return ResponseEntity.ok(cityService.updateCity(id, updatedCity));
+    public ResponseEntity<CityDTO> updateCity(
+            @PathVariable Long id,
+            @RequestBody CityDTO updatedCityDTO
+    ) {
+        CityDTO updatedCity = cityService.updateCity(id, updatedCityDTO);
+        return ResponseEntity.ok(updatedCity);
     }
 
-    // ✅ Delete a city
+    // ✅ DELETE a city (returns 204 if deleted, 404 if not found)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCity(@PathVariable Long id) {
-        cityService.deleteCity(id); // throws 404 if not found
-        return ResponseEntity.noContent().build(); // 204 No Content
+        boolean deleted = cityService.deleteCity(id);
+        return deleted
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
+    }
+
+    // 🔎 Q1: What airports are there in each city?
+    // Returns list of AirportDTOs (404 if none exist)
+    @GetMapping("/{id}/airports")
+    public ResponseEntity<List<AirportDTO>> getAirportsByCity(@PathVariable Long id) {
+        List<AirportDTO> airports = cityService.getAirportsByCityId(id);
+        return ResponseEntity.ok(airports);
     }
 }

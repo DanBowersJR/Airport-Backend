@@ -1,6 +1,6 @@
 package com.keyin.api.controller;
 
-import com.keyin.api.model.Airport;
+import com.keyin.api.dto.AirportDTO;
 import com.keyin.api.service.AirportService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,34 +18,40 @@ public class AirportController {
         this.airportService = airportService;
     }
 
-    // ✅ GET all airports
+    // ✅ GET all airports (returns DTOs)
     @GetMapping
-    public ResponseEntity<List<Airport>> getAllAirports() {
+    public ResponseEntity<List<AirportDTO>> getAllAirports() {
         return ResponseEntity.ok(airportService.getAllAirports());
     }
 
-    // ✅ GET one airport by ID (404 handled in service)
+    // ✅ GET one airport by ID (returns DTO)
     @GetMapping("/{id}")
-    public ResponseEntity<Airport> getAirportById(@PathVariable Long id) {
+    public ResponseEntity<AirportDTO> getAirportById(@PathVariable Long id) {
         return ResponseEntity.ok(airportService.getAirportById(id));
     }
 
-    // ✅ CREATE a new airport
+    // ✅ CREATE a new airport (takes DTO)
     @PostMapping
-    public ResponseEntity<Airport> createAirport(@RequestBody Airport airport) {
-        return new ResponseEntity<>(airportService.saveAirport(airport), HttpStatus.CREATED);
+    public ResponseEntity<AirportDTO> createAirport(@RequestBody AirportDTO airportDTO) {
+        AirportDTO savedAirport = airportService.saveAirport(airportDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedAirport);
     }
 
-    // ✅ UPDATE an airport
+    // ✅ UPDATE an airport (takes DTO)
     @PutMapping("/{id}")
-    public ResponseEntity<Airport> updateAirport(@PathVariable Long id, @RequestBody Airport updatedAirport) {
-        return ResponseEntity.ok(airportService.updateAirport(id, updatedAirport));
+    public ResponseEntity<AirportDTO> updateAirport(
+            @PathVariable Long id,
+            @RequestBody AirportDTO airportDTO
+    ) {
+        AirportDTO updatedAirport = airportService.updateAirport(id, airportDTO);
+        return ResponseEntity.ok(updatedAirport);
     }
 
     // ✅ DELETE an airport
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAirport(@PathVariable Long id) {
-        airportService.deleteAirport(id);
-        return ResponseEntity.noContent().build();
+        boolean deleted = airportService.deleteAirport(id);
+        return deleted ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
     }
 }

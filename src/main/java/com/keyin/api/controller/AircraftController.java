@@ -1,6 +1,7 @@
 package com.keyin.api.controller;
 
-import com.keyin.api.model.Aircraft;
+import com.keyin.api.dto.AircraftDTO;
+import com.keyin.api.dto.AirportDTO;
 import com.keyin.api.service.AircraftService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,42 +15,55 @@ public class AircraftController {
 
     private final AircraftService aircraftService;
 
-    // constructor injection
+    // ✅ Constructor injection
     public AircraftController(AircraftService aircraftService) {
         this.aircraftService = aircraftService;
     }
 
-    // ✅ GET all aircraft
+    // ✅ GET all aircraft (returns list of DTOs)
     @GetMapping
-    public ResponseEntity<List<Aircraft>> getAllAircraft() {
-        return ResponseEntity.ok(aircraftService.getAllAircraft());
+    public ResponseEntity<List<AircraftDTO>> getAllAircraft() {
+        List<AircraftDTO> aircraftList = aircraftService.getAllAircraft();
+        return ResponseEntity.ok(aircraftList);
     }
 
-    // ✅ GET one aircraft by ID
+    // ✅ GET single aircraft by ID (returns DTO)
     @GetMapping("/{id}")
-    public ResponseEntity<Aircraft> getAircraftById(@PathVariable Long id) {
-        Aircraft aircraft = aircraftService.getAircraftById(id);
+    public ResponseEntity<AircraftDTO> getAircraftById(@PathVariable Long id) {
+        AircraftDTO aircraft = aircraftService.getAircraftById(id);
         return ResponseEntity.ok(aircraft);
     }
 
-    // ✅ CREATE a new aircraft
+    // ✅ CREATE new aircraft (returns created DTO)
     @PostMapping
-    public ResponseEntity<Aircraft> createAircraft(@RequestBody Aircraft aircraft) {
-        Aircraft savedAircraft = aircraftService.saveAircraft(aircraft);
-        return new ResponseEntity<>(savedAircraft, HttpStatus.CREATED);
+    public ResponseEntity<AircraftDTO> createAircraft(@RequestBody AircraftDTO aircraftDTO) {
+        AircraftDTO savedAircraft = aircraftService.saveAircraft(aircraftDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedAircraft);
     }
 
-    // ✅ UPDATE existing aircraft
+    // ✅ UPDATE existing aircraft (returns updated DTO)
     @PutMapping("/{id}")
-    public ResponseEntity<Aircraft> updateAircraft(@PathVariable Long id, @RequestBody Aircraft aircraft) {
-        Aircraft updatedAircraft = aircraftService.updateAircraft(id, aircraft);
+    public ResponseEntity<AircraftDTO> updateAircraft(
+            @PathVariable Long id,
+            @RequestBody AircraftDTO aircraftDTO
+    ) {
+        AircraftDTO updatedAircraft = aircraftService.updateAircraft(id, aircraftDTO);
         return ResponseEntity.ok(updatedAircraft);
     }
 
-    // ✅ DELETE aircraft
+    // ✅ DELETE aircraft (returns 204 if deleted, 404 if not found)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAircraft(@PathVariable Long id) {
         boolean deleted = aircraftService.deleteAircraft(id);
-        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+        return deleted
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
+    }
+
+    // 🔎 Q3: What airport does this aircraft take off from / land at?
+    @GetMapping("/{id}/airport")
+    public ResponseEntity<AirportDTO> getAirportForAircraft(@PathVariable Long id) {
+        AirportDTO airportDTO = aircraftService.getAirportForAircraft(id);
+        return ResponseEntity.ok(airportDTO);
     }
 }

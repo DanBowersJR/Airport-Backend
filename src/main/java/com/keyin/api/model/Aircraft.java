@@ -1,11 +1,11 @@
 package com.keyin.api.model;
 
 import jakarta.persistence.*;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "aircraft")
@@ -24,15 +24,15 @@ public class Aircraft {
     @Column(nullable = false)
     private int numberOfPassengers;
 
-    // Each aircraft has 10 passengers (Many-to-Many with Passenger)
+    // ✅ Many-to-Many with Passenger
     @ManyToMany(mappedBy = "aircraftList", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JsonManagedReference // works with @JsonBackReference in Passenger
+    @JsonBackReference // matches @JsonManagedReference in Passenger
     private List<Passenger> passengers = new ArrayList<>();
 
-    // Each aircraft belongs to exactly ONE airport (Many-to-One)
+    // ✅ Many-to-One with Airport
     @ManyToOne
     @JoinColumn(name = "airport_id", nullable = false)
-    @JsonBackReference // prevents infinite recursion with Airport -> Aircraft -> Airport
+    @JsonManagedReference // matches @JsonBackReference in Airport
     private Airport airport;
 
     // Constructors
