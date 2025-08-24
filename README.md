@@ -49,7 +49,7 @@ Custom Queries:
 
 🚀 Getting Started
 1. Clone the repo
-git clone https://github.com/YOUR_USERNAME/airport-api-backend.git
+git clone https://github.com/DanBowersJR/airport-api-backend.git
 cd airport-api-backend
 
 2. Configure the Database
