@@ -17,7 +17,7 @@ CRUD operations for:
 
 Relational mappings:
 
-•Each City has exactly 1 Airport
+•Each City can have many airports
 
 •Each Airport can host multiple Aircraft
 
