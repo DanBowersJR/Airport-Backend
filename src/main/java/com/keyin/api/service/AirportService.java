@@ -46,6 +46,18 @@ public class AirportService {
         return AirportMapper.toDTO(airport);
     }
 
+    // ✅ NEW: Get all airports by city ID
+    public List<AirportDTO> getAirportsByCity(Long cityId) {
+        City city = cityRepository.findById(cityId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "City not found with id: " + cityId));
+
+        return airportRepository.findByCityId(cityId)
+                .stream()
+                .map(AirportMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
     // ✅ Create new airport
     public AirportDTO saveAirport(AirportDTO dto) {
         if (dto.getCityId() == null) {

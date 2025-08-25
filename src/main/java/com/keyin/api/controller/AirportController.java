@@ -33,6 +33,13 @@ public class AirportController {
         return ResponseEntity.ok(airport);
     }
 
+    // ✅ NEW: GET all airports in a given city
+    @GetMapping("/city/{cityId}")
+    public ResponseEntity<List<AirportDTO>> getAirportsByCity(@PathVariable Long cityId) {
+        List<AirportDTO> airports = airportService.getAirportsByCity(cityId);
+        return ResponseEntity.ok(airports);
+    }
+
     // ✅ CREATE a new airport
     @PostMapping
     public ResponseEntity<AirportDTO> createAirport(@RequestBody AirportDTO airportDTO) {

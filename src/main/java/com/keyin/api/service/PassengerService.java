@@ -36,7 +36,7 @@ public class PassengerService {
         this.aircraftRepository = aircraftRepository;
     }
 
-    // ✅ Get all passengers as DTOs
+    // ✅ Get all passengers
     public List<PassengerDTO> getAllPassengers() {
         return passengerRepository.findAll()
                 .stream()
@@ -44,7 +44,7 @@ public class PassengerService {
                 .collect(Collectors.toList());
     }
 
-    // ✅ Get passenger by ID (as DTO)
+    // ✅ Get passenger by ID
     public PassengerDTO getPassengerById(Long id) {
         Passenger passenger = passengerRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -107,7 +107,7 @@ public class PassengerService {
         return true;
     }
 
-    // 🔎 Q2: What aircraft has each passenger flown on? (returns AircraftDTOs)
+    // 🔎 Q2: What aircraft has each passenger flown on?
     public List<AircraftDTO> getAircraftByPassenger(Long passengerId) {
         Passenger passenger = passengerRepository.findById(passengerId)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -124,7 +124,7 @@ public class PassengerService {
                 .collect(Collectors.toList());
     }
 
-    // 🔎 Q4: What airports have passengers used? (returns AirportDTOs)
+    // 🔎 Q4: What airports have passengers used?
     public Set<AirportDTO> getAirportsUsedByPassenger(Long passengerId) {
         Passenger passenger = passengerRepository.findById(passengerId)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -136,8 +136,8 @@ public class PassengerService {
         }
 
         return passenger.getAircraftList().stream()
-                .flatMap(aircraft -> aircraft.getAirports().stream())  // ✅ flatten all airports per aircraft
+                .flatMap(aircraft -> aircraft.getAirports().stream())
                 .map(AirportMapper::toDTO)
-                .collect(Collectors.toSet()); // distinct airports only
+                .collect(Collectors.toSet()); // ✅ ensures distinct airports
     }
 }

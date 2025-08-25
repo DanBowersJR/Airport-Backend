@@ -66,4 +66,11 @@ public class AircraftController {
         List<AirportDTO> airports = aircraftService.getAirportsForAircraft(id);
         return ResponseEntity.ok(airports);
     }
+
+    // 🔎 Q2: What aircraft has this passenger flown on?
+    @GetMapping("/passenger/{passengerId}")
+    public ResponseEntity<List<AircraftDTO>> getAircraftByPassenger(@PathVariable Long passengerId) {
+        List<AircraftDTO> aircraftList = aircraftService.getAircraftByPassenger(passengerId);
+        return ResponseEntity.ok(aircraftList);
+    }
 }

@@ -22,26 +22,26 @@ public class PassengerController {
         this.passengerService = passengerService;
     }
 
-    // ✅ CREATE Passenger (accepts DTO, returns DTO)
+    // ✅ CREATE Passenger
     @PostMapping
     public ResponseEntity<PassengerDTO> createPassenger(@RequestBody PassengerDTO passengerDTO) {
         PassengerDTO savedPassenger = passengerService.savePassenger(passengerDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedPassenger);
     }
 
-    // ✅ READ ALL Passengers (returns list of DTOs)
+    // ✅ READ ALL Passengers
     @GetMapping
     public ResponseEntity<List<PassengerDTO>> getAllPassengers() {
         return ResponseEntity.ok(passengerService.getAllPassengers());
     }
 
-    // ✅ READ ONE Passenger by ID (returns DTO)
+    // ✅ READ ONE Passenger by ID
     @GetMapping("/{id}")
     public ResponseEntity<PassengerDTO> getPassengerById(@PathVariable Long id) {
         return ResponseEntity.ok(passengerService.getPassengerById(id));
     }
 
-    // ✅ UPDATE Passenger (accepts DTO, returns DTO)
+    // ✅ UPDATE Passenger
     @PutMapping("/{id}")
     public ResponseEntity<PassengerDTO> updatePassenger(
             @PathVariable Long id,
@@ -50,24 +50,26 @@ public class PassengerController {
         return ResponseEntity.ok(passengerService.updatePassenger(id, passengerDTO));
     }
 
-    // ✅ DELETE Passenger (returns 204 if deleted, 404 if not found)
+    // ✅ DELETE Passenger
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePassenger(@PathVariable Long id) {
         boolean deleted = passengerService.deletePassenger(id);
         return deleted
-                ? ResponseEntity.noContent().build()   // 204 No Content
-                : ResponseEntity.notFound().build();   // 404 Not Found
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
     }
 
-    // 🔎 Q2: What aircraft has this passenger flown on? (returns AircraftDTOs)
+    // 🔎 Q2: What aircraft has this passenger flown on?
     @GetMapping("/{id}/aircraft")
     public ResponseEntity<List<AircraftDTO>> getAircraftByPassenger(@PathVariable Long id) {
-        return ResponseEntity.ok(passengerService.getAircraftByPassenger(id));
+        List<AircraftDTO> aircraftList = passengerService.getAircraftByPassenger(id);
+        return ResponseEntity.ok(aircraftList);
     }
 
-    // 🔎 Q4: What airports has this passenger used? (returns AirportDTOs)
+    // 🔎 Q4: What airports has this passenger used?
     @GetMapping("/{id}/airports")
     public ResponseEntity<Set<AirportDTO>> getAirportsUsedByPassenger(@PathVariable Long id) {
-        return ResponseEntity.ok(passengerService.getAirportsUsedByPassenger(id));
+        Set<AirportDTO> airports = passengerService.getAirportsUsedByPassenger(id);
+        return ResponseEntity.ok(airports);
     }
 }

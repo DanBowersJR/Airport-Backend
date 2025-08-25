@@ -123,4 +123,16 @@ public class AircraftService {
                 .map(AirportMapper::toDTO)
                 .collect(Collectors.toList());
     }
+
+    // ✅ Q2: Get all aircraft a passenger has flown on
+    public List<AircraftDTO> getAircraftByPassenger(Long passengerId) {
+        List<Aircraft> aircraftList = aircraftRepository.findAircraftByPassengerId(passengerId);
+        if (aircraftList.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "No aircraft found for passenger with id: " + passengerId);
+        }
+        return aircraftList.stream()
+                .map(AircraftMapper::toDTO)
+                .collect(Collectors.toList());
+    }
 }

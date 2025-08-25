@@ -22,84 +22,62 @@ public class DataSeeder {
                                    PassengerRepository passengerRepo) {
         return args -> {
             // --- Seed Cities ---
-            City toronto = new City();
-            toronto.setName("Toronto");
-            cityRepo.save(toronto);
+            City toronto = cityRepo.findByName("Toronto")
+                    .orElseGet(() -> cityRepo.save(new City("Toronto")));
 
-            City newYork = new City();
-            newYork.setName("New York");
-            cityRepo.save(newYork);
+            City newYork = cityRepo.findByName("New York")
+                    .orElseGet(() -> cityRepo.save(new City("New York")));
 
-            City london = new City();
-            london.setName("London");
-            cityRepo.save(london);
+            City london = cityRepo.findByName("London")
+                    .orElseGet(() -> cityRepo.save(new City("London")));
 
             // --- Seed Airports ---
-            Airport pearson = new Airport();
-            pearson.setCode("YYZ");
-            pearson.setName("Toronto Pearson");
-            pearson.setCity(toronto);
-            airportRepo.save(pearson);
+            if (airportRepo.findByCode("YYZ").isEmpty()) {
+                Airport pearson = new Airport();
+                pearson.setCode("YYZ");
+                pearson.setName("Toronto Pearson");
+                pearson.setCity(toronto);
+                airportRepo.save(pearson);
+            }
 
-            Airport jfk = new Airport();
-            jfk.setCode("JFK");
-            jfk.setName("John F. Kennedy");
-            jfk.setCity(newYork);
-            airportRepo.save(jfk);
+            if (airportRepo.findByCode("YTZ").isEmpty()) {
+                Airport billyBishop = new Airport();
+                billyBishop.setCode("YTZ");
+                billyBishop.setName("Billy Bishop Toronto City Airport");
+                billyBishop.setCity(toronto);
+                airportRepo.save(billyBishop);
+            }
 
-            Airport heathrow = new Airport();
-            heathrow.setCode("LHR");
-            heathrow.setName("Heathrow");
-            heathrow.setCity(london);
-            airportRepo.save(heathrow);
+            if (airportRepo.findByCode("JFK").isEmpty()) {
+                Airport jfk = new Airport();
+                jfk.setCode("JFK");
+                jfk.setName("John F. Kennedy");
+                jfk.setCity(newYork);
+                airportRepo.save(jfk);
+            }
+
+            if (airportRepo.findByCode("LHR").isEmpty()) {
+                Airport heathrow = new Airport();
+                heathrow.setCode("LHR");
+                heathrow.setName("Heathrow");
+                heathrow.setCity(london);
+                airportRepo.save(heathrow);
+            }
 
             // --- Seed Aircraft ---
-            Aircraft airCanada = new Aircraft();
-            airCanada.setAirlineName("Air Canada");
-            airCanada.setType("Boeing 777");
-            airCanada.setNumberOfPassengers(300);
-            aircraftRepo.save(airCanada);
-
-            Aircraft delta = new Aircraft();
-            delta.setAirlineName("Delta Airlines");
-            delta.setType("Airbus A350");
-            delta.setNumberOfPassengers(280);
-            aircraftRepo.save(delta);
-
-            Aircraft britishAirways = new Aircraft();
-            britishAirways.setAirlineName("British Airways");
-            britishAirways.setType("Boeing 787");
-            britishAirways.setNumberOfPassengers(250);
-            aircraftRepo.save(britishAirways);
+            if (aircraftRepo.findAll().isEmpty()) {
+                aircraftRepo.save(new Aircraft("Air Canada", "Boeing 777", 300));
+                aircraftRepo.save(new Aircraft("Delta Airlines", "Airbus A350", 280));
+                aircraftRepo.save(new Aircraft("British Airways", "Boeing 787", 250));
+            }
 
             // --- Seed Passengers ---
-            Passenger alice = new Passenger();
-            alice.setFirstName("Alice");
-            alice.setLastName("Smith");
-            alice.setPhoneNumber("111-111-1111");
-            alice.setCity(toronto);
-            passengerRepo.save(alice);
-
-            Passenger bob = new Passenger();
-            bob.setFirstName("Bob");
-            bob.setLastName("Johnson");
-            bob.setPhoneNumber("222-222-2222");
-            bob.setCity(newYork);
-            passengerRepo.save(bob);
-
-            Passenger charlie = new Passenger();
-            charlie.setFirstName("Charlie");
-            charlie.setLastName("Brown");
-            charlie.setPhoneNumber("333-333-3333");
-            charlie.setCity(london);
-            passengerRepo.save(charlie);
-
-            Passenger diana = new Passenger();
-            diana.setFirstName("Diana");
-            diana.setLastName("White");
-            diana.setPhoneNumber("444-444-4444");
-            diana.setCity(toronto);
-            passengerRepo.save(diana);
+            if (passengerRepo.findAll().isEmpty()) {
+                passengerRepo.save(new Passenger("Alice", "Smith", "111-111-1111", toronto));
+                passengerRepo.save(new Passenger("Bob", "Johnson", "222-222-2222", newYork));
+                passengerRepo.save(new Passenger("Charlie", "Brown", "333-333-3333", london));
+                passengerRepo.save(new Passenger("Diana", "White", "444-444-4444", toronto));
+            }
         };
     }
 }
