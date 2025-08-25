@@ -14,30 +14,33 @@ public class AirportController {
 
     private final AirportService airportService;
 
+    // ✅ Constructor Injection
     public AirportController(AirportService airportService) {
         this.airportService = airportService;
     }
 
-    // ✅ GET all airports (returns DTOs)
+    // ✅ GET all airports
     @GetMapping
     public ResponseEntity<List<AirportDTO>> getAllAirports() {
-        return ResponseEntity.ok(airportService.getAllAirports());
+        List<AirportDTO> airports = airportService.getAllAirports();
+        return ResponseEntity.ok(airports);
     }
 
-    // ✅ GET one airport by ID (returns DTO)
+    // ✅ GET one airport by ID
     @GetMapping("/{id}")
     public ResponseEntity<AirportDTO> getAirportById(@PathVariable Long id) {
-        return ResponseEntity.ok(airportService.getAirportById(id));
+        AirportDTO airport = airportService.getAirportById(id);
+        return ResponseEntity.ok(airport);
     }
 
-    // ✅ CREATE a new airport (takes DTO)
+    // ✅ CREATE a new airport
     @PostMapping
     public ResponseEntity<AirportDTO> createAirport(@RequestBody AirportDTO airportDTO) {
         AirportDTO savedAirport = airportService.saveAirport(airportDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedAirport);
     }
 
-    // ✅ UPDATE an airport (takes DTO)
+    // ✅ UPDATE an airport
     @PutMapping("/{id}")
     public ResponseEntity<AirportDTO> updateAirport(
             @PathVariable Long id,
@@ -51,7 +54,8 @@ public class AirportController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAirport(@PathVariable Long id) {
         boolean deleted = airportService.deleteAirport(id);
-        return deleted ? ResponseEntity.noContent().build()
+        return deleted
+                ? ResponseEntity.noContent().build()
                 : ResponseEntity.notFound().build();
     }
 }

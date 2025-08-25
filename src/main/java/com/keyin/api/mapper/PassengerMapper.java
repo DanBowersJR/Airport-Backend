@@ -11,11 +11,11 @@ import java.util.stream.Collectors;
 
 public class PassengerMapper {
 
-    // ✅ Convert Entity -> DTO
+    // ✅ Entity -> DTO
     public static PassengerDTO toDTO(Passenger passenger) {
         if (passenger == null) return null;
 
-        // Map aircrafts to list of IDs
+        // Map aircraft -> list of IDs
         List<Long> aircraftIds = (passenger.getAircraftList() != null)
                 ? passenger.getAircraftList().stream()
                 .map(Aircraft::getId)
@@ -27,12 +27,12 @@ public class PassengerMapper {
                 passenger.getFirstName(),
                 passenger.getLastName(),
                 passenger.getPhoneNumber(),
-                (passenger.getCity() != null ? passenger.getCity().getId() : null), // Only send cityId
-                aircraftIds // Only send aircraft IDs
+                (passenger.getCity() != null ? passenger.getCity().getId() : null), // Only cityId
+                aircraftIds // Only aircraft IDs
         );
     }
 
-    // ✅ Convert DTO -> Entity
+    // ✅ DTO -> Entity
     public static Passenger toEntity(PassengerDTO dto, City city, List<Aircraft> aircraftList) {
         if (dto == null) return null;
 

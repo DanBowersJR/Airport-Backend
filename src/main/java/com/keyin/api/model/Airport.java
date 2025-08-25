@@ -1,14 +1,11 @@
 package com.keyin.api.model;
 
 import jakarta.persistence.*;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "airports")
+@Table(name = "airport")
 public class Airport {
 
     @Id
@@ -18,18 +15,16 @@ public class Airport {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false, unique = true, length = 5)
+    @Column(nullable = false, unique = true)
     private String code;
 
-    // ✅ Many Airports -> One City
+    // ✅ Many-to-One with City
     @ManyToOne
     @JoinColumn(name = "city_id", nullable = false)
-    @JsonBackReference // prevents recursion City -> Airport -> City
     private City city;
 
-    // ✅ One Airport -> Many Aircraft
-    @OneToMany(mappedBy = "airport", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference // matches @JsonBackReference in Aircraft
+    // ✅ Many-to-Many with Aircraft
+    @ManyToMany(mappedBy = "airports")
     private List<Aircraft> aircraftList = new ArrayList<>();
 
     // Constructors
@@ -56,15 +51,4 @@ public class Airport {
 
     public List<Aircraft> getAircraftList() { return aircraftList; }
     public void setAircraftList(List<Aircraft> aircraftList) { this.aircraftList = aircraftList; }
-
-    // ✅ Helper methods for syncing both sides
-    public void addAircraft(Aircraft aircraft) {
-        aircraftList.add(aircraft);
-        aircraft.setAirport(this);
-    }
-
-    public void removeAircraft(Aircraft aircraft) {
-        aircraftList.remove(aircraft);
-        aircraft.setAirport(null);
-    }
 }

@@ -1,14 +1,11 @@
 package com.keyin.api.model;
 
 import jakarta.persistence.*;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "passengers")
+@Table(name = "passenger")  // ✅ singular for consistency
 public class Passenger {
 
     @Id
@@ -27,7 +24,6 @@ public class Passenger {
     // ✅ Passenger lives in ONE city
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "city_id", nullable = false)
-    @JsonBackReference // prevents infinite recursion City -> Passenger -> City
     private City city;
 
     // ✅ Passenger can fly on MANY aircraft
@@ -37,7 +33,6 @@ public class Passenger {
             joinColumns = @JoinColumn(name = "passenger_id"),
             inverseJoinColumns = @JoinColumn(name = "aircraft_id")
     )
-    @JsonManagedReference // matches @JsonBackReference in Aircraft
     private List<Aircraft> aircraftList = new ArrayList<>();
 
     // ✅ Constructors

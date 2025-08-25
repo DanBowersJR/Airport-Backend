@@ -26,7 +26,7 @@ public class CityService {
         this.airportRepository = airportRepository;
     }
 
-    // ✅ Get all cities as DTOs
+    // ✅ Get all cities
     public List<CityDTO> getAllCities() {
         return cityRepository.findAll()
                 .stream()
@@ -34,17 +34,15 @@ public class CityService {
                 .collect(Collectors.toList());
     }
 
-    // ✅ Get one city by ID as DTO
+    // ✅ Get city by ID
     public CityDTO getCityById(Long id) {
         City city = cityRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "City not found with id: " + id
-                ));
+                        HttpStatus.NOT_FOUND, "City not found with id: " + id));
         return CityMapper.toDTO(city);
     }
 
-    // ✅ Create a new city
+    // ✅ Create new city
     public CityDTO saveCity(CityDTO dto) {
         List<Airport> airports = (dto.getAirportIds() != null && !dto.getAirportIds().isEmpty())
                 ? airportRepository.findAllById(dto.getAirportIds())
@@ -52,16 +50,15 @@ public class CityService {
 
         City city = CityMapper.toEntity(dto, airports);
         City saved = cityRepository.save(city);
+
         return CityMapper.toDTO(saved);
     }
 
-    // ✅ Update an existing city
+    // ✅ Update existing city
     public CityDTO updateCity(Long id, CityDTO dto) {
         City existing = cityRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "City not found with id: " + id
-                ));
+                        HttpStatus.NOT_FOUND, "City not found with id: " + id));
 
         List<Airport> airports = (dto.getAirportIds() != null && !dto.getAirportIds().isEmpty())
                 ? airportRepository.findAllById(dto.getAirportIds())
@@ -76,30 +73,28 @@ public class CityService {
         return CityMapper.toDTO(updated);
     }
 
-    // ✅ Delete a city
+    // ✅ Delete city
     public boolean deleteCity(Long id) {
-        if (!cityRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "City not found with id: " + id);
-        }
-        cityRepository.deleteById(id);
+        City city = cityRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "City not found with id: " + id));
+        cityRepository.delete(city);
         return true;
     }
 
-    // 🔎 Q1: What airports are there in each city?
+    // 🔎 Q1: Get airports by city ID
     public List<AirportDTO> getAirportsByCityId(Long cityId) {
         City city = cityRepository.findById(cityId)
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "City not found with id: " + cityId
-                ));
+                        HttpStatus.NOT_FOUND, "City not found with id: " + cityId));
 
-        if (city.getAirports() == null || city.getAirports().isEmpty()) {
+        List<Airport> airports = city.getAirports();
+        if (airports == null || airports.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     "No airports found for city with id: " + cityId);
         }
 
-        return city.getAirports()
-                .stream()
+        return airports.stream()
                 .map(AirportMapper::toDTO)
                 .collect(Collectors.toList());
     }

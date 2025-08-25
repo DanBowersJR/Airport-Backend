@@ -2,7 +2,6 @@ package com.keyin.api.model;
 
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,20 +28,22 @@ public class Aircraft {
     @JsonBackReference // matches @JsonManagedReference in Passenger
     private List<Passenger> passengers = new ArrayList<>();
 
-    // ✅ Many-to-One with Airport
-    @ManyToOne
-    @JoinColumn(name = "airport_id", nullable = false)
-    @JsonManagedReference // matches @JsonBackReference in Airport
-    private Airport airport;
+    // ✅ Many-to-Many with Airport (takeoff/landing)
+    @ManyToMany
+    @JoinTable(
+            name = "aircraft_airport",
+            joinColumns = @JoinColumn(name = "aircraft_id"),
+            inverseJoinColumns = @JoinColumn(name = "airport_id")
+    )
+    private List<Airport> airports = new ArrayList<>();
 
     // Constructors
     public Aircraft() {}
 
-    public Aircraft(String type, String airlineName, int numberOfPassengers, Airport airport) {
+    public Aircraft(String type, String airlineName, int numberOfPassengers) {
         this.type = type;
         this.airlineName = airlineName;
         this.numberOfPassengers = numberOfPassengers;
-        this.airport = airport;
     }
 
     // Getters & Setters
@@ -61,6 +62,6 @@ public class Aircraft {
     public List<Passenger> getPassengers() { return passengers; }
     public void setPassengers(List<Passenger> passengers) { this.passengers = passengers; }
 
-    public Airport getAirport() { return airport; }
-    public void setAirport(Airport airport) { this.airport = airport; }
+    public List<Airport> getAirports() { return airports; }
+    public void setAirports(List<Airport> airports) { this.airports = airports; }
 }

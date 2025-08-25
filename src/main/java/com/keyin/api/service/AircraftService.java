@@ -32,7 +32,7 @@ public class AircraftService {
         this.passengerRepository = passengerRepository;
     }
 
-    // ✅ Get all aircraft as DTOs
+    // ✅ Get all aircraft
     public List<AircraftDTO> getAllAircraft() {
         return aircraftRepository.findAll()
                 .stream()
@@ -40,7 +40,7 @@ public class AircraftService {
                 .collect(Collectors.toList());
     }
 
-    // ✅ Get aircraft by ID (returns DTO)
+    // ✅ Get aircraft by ID
     public AircraftDTO getAircraftById(Long id) {
         Aircraft aircraft = aircraftRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -48,22 +48,27 @@ public class AircraftService {
         return AircraftMapper.toDTO(aircraft);
     }
 
-    // ✅ Save new aircraft
+    // ✅ Create new aircraft
     public AircraftDTO saveAircraft(AircraftDTO dto) {
-        // Lookup airport
-        Airport airport = airportRepository.findById(dto.getAirportId())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Airport not found with id: " + dto.getAirportId()));
+        if (dto == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Aircraft data must not be null");
+        }
 
-        // Lookup passengers
+        // Load airports if provided
+        List<Airport> airports = (dto.getAirportIds() != null && !dto.getAirportIds().isEmpty())
+                ? airportRepository.findAllById(dto.getAirportIds())
+                : List.of();
+
+        // Load passengers if provided
         List<Passenger> passengers = (dto.getPassengerIds() != null && !dto.getPassengerIds().isEmpty())
                 ? passengerRepository.findAllById(dto.getPassengerIds())
                 : List.of();
 
-        // Map DTO -> Entity
-        Aircraft aircraft = AircraftMapper.toEntity(dto, airport, passengers);
-        Aircraft saved = aircraftRepository.save(aircraft);
+        // Map DTO → Entity
+        Aircraft aircraft = AircraftMapper.toEntity(dto, airports, passengers);
 
+        // Save and return DTO
+        Aircraft saved = aircraftRepository.save(aircraft);
         return AircraftMapper.toDTO(saved);
     }
 
@@ -73,24 +78,26 @@ public class AircraftService {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Aircraft not found with id: " + id));
 
-        // Update airport if provided
-        if (dto.getAirportId() != null) {
-            Airport airport = airportRepository.findById(dto.getAirportId())
-                    .orElseThrow(() -> new ResponseStatusException(
-                            HttpStatus.NOT_FOUND, "Airport not found with id: " + dto.getAirportId()));
-            existing.setAirport(airport);
+        if (dto == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Aircraft data must not be null");
         }
 
-        // Update passengers if provided, otherwise keep existing
-        List<Passenger> passengers = (dto.getPassengerIds() != null && !dto.getPassengerIds().isEmpty())
-                ? passengerRepository.findAllById(dto.getPassengerIds())
-                : existing.getPassengers();
+        // Update fields if provided
+        if (dto.getType() != null) existing.setType(dto.getType());
+        if (dto.getAirlineName() != null) existing.setAirlineName(dto.getAirlineName());
+        if (dto.getNumberOfPassengers() > 0) existing.setNumberOfPassengers(dto.getNumberOfPassengers());
 
-        // Update basic fields
-        existing.setType(dto.getType());
-        existing.setAirlineName(dto.getAirlineName());
-        existing.setNumberOfPassengers(dto.getNumberOfPassengers());
-        existing.setPassengers(passengers);
+        // Update airports if provided
+        if (dto.getAirportIds() != null) {
+            List<Airport> airports = airportRepository.findAllById(dto.getAirportIds());
+            existing.setAirports(airports);
+        }
+
+        // Update passengers if provided
+        if (dto.getPassengerIds() != null) {
+            List<Passenger> passengers = passengerRepository.findAllById(dto.getPassengerIds());
+            existing.setPassengers(passengers);
+        }
 
         Aircraft updated = aircraftRepository.save(existing);
         return AircraftMapper.toDTO(updated);
@@ -105,18 +112,15 @@ public class AircraftService {
         return true;
     }
 
-    // 🔎 Q3: What airport does an aircraft take off from / land at?
-    public AirportDTO getAirportForAircraft(Long id) {
+    // ✅ Q3: Get airports for aircraft
+    public List<AirportDTO> getAirportsForAircraft(Long id) {
         Aircraft aircraft = aircraftRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Aircraft not found with id: " + id));
 
-        Airport airport = aircraft.getAirport();
-        if (airport == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "No airport assigned for aircraft with id: " + id);
-        }
-
-        return AirportMapper.toDTO(airport); // ✅ Always return DTO
+        return aircraft.getAirports()
+                .stream()
+                .map(AirportMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }

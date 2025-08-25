@@ -15,7 +15,7 @@ public class AirportMapper {
     public static AirportDTO toDTO(Airport airport) {
         if (airport == null) return null;
 
-        // Collect aircraft IDs if airport has aircraft
+        // Convert Aircraft -> IDs
         List<Long> aircraftIds = (airport.getAircraftList() != null)
                 ? airport.getAircraftList().stream()
                 .map(Aircraft::getId)
@@ -26,7 +26,7 @@ public class AirportMapper {
                 airport.getId(),
                 airport.getName(),
                 airport.getCode(),
-                (airport.getCity() != null ? airport.getCity().getId() : null), // only cityId
+                (airport.getCity() != null ? airport.getCity().getId() : null),
                 aircraftIds
         );
     }

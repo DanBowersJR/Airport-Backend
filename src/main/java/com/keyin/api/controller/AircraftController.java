@@ -60,10 +60,10 @@ public class AircraftController {
                 : ResponseEntity.notFound().build();
     }
 
-    // 🔎 Q3: What airport does this aircraft take off from / land at?
-    @GetMapping("/{id}/airport")
-    public ResponseEntity<AirportDTO> getAirportForAircraft(@PathVariable Long id) {
-        AirportDTO airportDTO = aircraftService.getAirportForAircraft(id);
-        return ResponseEntity.ok(airportDTO);
+    // 🔎 Q3: What airports does this aircraft use? (takeoff/landing)
+    @GetMapping("/{id}/airports")
+    public ResponseEntity<List<AirportDTO>> getAirportsForAircraft(@PathVariable Long id) {
+        List<AirportDTO> airports = aircraftService.getAirportsForAircraft(id);
+        return ResponseEntity.ok(airports);
     }
 }

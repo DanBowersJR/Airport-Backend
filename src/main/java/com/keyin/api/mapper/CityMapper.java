@@ -1,8 +1,8 @@
 package com.keyin.api.mapper;
 
 import com.keyin.api.dto.CityDTO;
-import com.keyin.api.model.Airport;
 import com.keyin.api.model.City;
+import com.keyin.api.model.Airport;   // ✅ Added missing import
 
 import java.util.Collections;
 import java.util.List;
@@ -16,7 +16,7 @@ public class CityMapper {
 
         List<Long> airportIds = (city.getAirports() != null && !city.getAirports().isEmpty())
                 ? city.getAirports().stream()
-                .map(Airport::getId)
+                .map(Airport::getId)  // ✅ works now
                 .collect(Collectors.toList())
                 : Collections.emptyList();
 
@@ -41,7 +41,8 @@ public class CityMapper {
 
         if (airports != null && !airports.isEmpty()) {
             city.setAirports(airports);
-            airports.forEach(a -> a.setCity(city)); // keep both sides in sync
+            // ✅ keep both sides in sync
+            airports.forEach(a -> a.setCity(city));
         } else {
             city.setAirports(Collections.emptyList());
         }

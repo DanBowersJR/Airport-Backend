@@ -136,8 +136,7 @@ public class PassengerService {
         }
 
         return passenger.getAircraftList().stream()
-                .map(Aircraft::getAirport)
-                .filter(a -> a != null) // safeguard against null airports
+                .flatMap(aircraft -> aircraft.getAirports().stream())  // ✅ flatten all airports per aircraft
                 .map(AirportMapper::toDTO)
                 .collect(Collectors.toSet()); // distinct airports only
     }
