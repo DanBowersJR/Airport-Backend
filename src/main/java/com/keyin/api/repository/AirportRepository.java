@@ -15,4 +15,7 @@ public interface AirportRepository extends JpaRepository<Airport, Long> {
 
     // Find a specific airport by its name
     Optional<Airport> findByName(String name);
+
+    // ✅ Find a specific airport by its code
+    Optional<Airport> findByCode(String code);
 }
