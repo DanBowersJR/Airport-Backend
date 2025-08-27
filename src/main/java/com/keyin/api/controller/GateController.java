@@ -1,36 +1,56 @@
 package com.keyin.api.controller;
 
 import com.keyin.api.dto.GateDTO;
-import com.keyin.api.mapper.GateMapper;
-import com.keyin.api.model.Airport;
-import com.keyin.api.model.Gate;
-import com.keyin.api.repository.AirportRepository;
-import com.keyin.api.repository.GateRepository;
+import com.keyin.api.service.GateService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/gates")
 public class GateController {
 
-    private final GateRepository gateRepository;
-    private final AirportRepository airportRepository;
+    private final GateService gateService;
 
-    public GateController(GateRepository gateRepository, AirportRepository airportRepository) {
-        this.gateRepository = gateRepository;
-        this.airportRepository = airportRepository;
+    public GateController(GateService gateService) {
+        this.gateService = gateService;
     }
 
-    // List all gates for a given airport
+    // List all gates across all airports
+    @GetMapping
+    public ResponseEntity<List<GateDTO>> getAll() {
+        return ResponseEntity.ok(gateService.listAll());
+    }
+
+    // List gates for a specific airport
     @GetMapping("/airport/{airportId}")
-    public ResponseEntity<List<GateDTO>> getByAirport(@PathVariable Long airportId) {
-        List<Gate> gates = gateRepository.findByAirport_Id(airportId);
-        List<GateDTO> dtos = gates.stream()
-                .map(GateMapper::toDTO)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(dtos);
+    public ResponseEntity<List<GateDTO>> byAirport(@PathVariable Long airportId) {
+        return ResponseEntity.ok(gateService.listByAirport(airportId));
+    }
+
+    // Get one gate
+    @GetMapping("/{id}")
+    public ResponseEntity<GateDTO> get(@PathVariable Long id) {
+        GateDTO dto = gateService.get(id);
+        return dto != null ? ResponseEntity.ok(dto) : ResponseEntity.notFound().build();
+    }
+
+    // Create a gate (requires airportId in body)
+    @PostMapping
+    public ResponseEntity<?> create(@RequestBody GateDTO dto) {
+        try {
+            GateDTO saved = gateService.create(dto);
+            return ResponseEntity.ok(saved);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    // Delete a gate
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        boolean existed = gateService.delete(id);
+        return existed ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 }
